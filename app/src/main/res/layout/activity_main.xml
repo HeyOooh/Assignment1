@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="409dp"
+        android:layout_height="729dp"
+        android:layout_marginStart="1dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="1dp"
+        android:layout_marginBottom="1dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="30dp"
+            android:orientation="horizontal">
+
+            <!--suppress CheckTagEmptyBody -->
+            <ImageButton
+                android:id="@+id/dice0"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_margin="10dp"
+                android:layout_weight="16"
+                android:background="@drawable/white1"
+                android:contentDescription="@string/dice_content_desc"
+                android:scaleType="fitCenter"></ImageButton>
+
+            <!--suppress CheckTagEmptyBody -->
+            <ImageButton
+                android:id="@+id/dice1"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_margin="10dp"
+                android:layout_weight="16"
+                android:background="@drawable/white2"
+                android:contentDescription="@string/dice_content_desc"
+                android:scaleType="fitCenter"></ImageButton>
+
+            <!--suppress CheckTagEmptyBody -->
+            <ImageButton
+                android:id="@+id/dice2"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_margin="10dp"
+                android:layout_weight="16"
+                android:background="@drawable/white3"
+                android:contentDescription="@string/dice_content_desc"
+                android:scaleType="fitCenter"></ImageButton>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:orientation="horizontal">
+
+            <!--suppress CheckTagEmptyBody -->
+            <ImageButton
+                android:id="@+id/dice3"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_margin="10dp"
+                android:layout_weight="16"
+                android:background="@drawable/white4"
+                android:contentDescription="@string/dice_content_desc"
+                android:scaleType="fitCenter"></ImageButton>
+
+            <!--suppress CheckTagEmptyBody -->
+            <ImageButton
+                android:id="@+id/dice4"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_margin="10dp"
+                android:layout_weight="16"
+                android:background="@drawable/white5"
+                android:contentDescription="@string/dice_content_desc"
+                android:scaleType="fitCenter"></ImageButton>
+
+            <!--suppress CheckTagEmptyBody -->
+            <ImageButton
+                android:id="@+id/dice5"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_margin="10dp"
+                android:layout_weight="16"
+                android:background="@drawable/white6"
+                android:contentDescription="@string/dice_content_desc"
+                android:scaleType="fitCenter"></ImageButton>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textViewInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="60dp"
+            android:text="@string/info_start_game"
+            android:textStyle="bold|italic"
+            android:textSize="20dp"
+            android:textColor="@color/teal_700"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:orientation="horizontal"
+            >
+
+            <Button
+                android:id="@+id/save_paired_dice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_weight="1"
+                android:text="@string/submit_pair_dice"
+                tools:ignore="ButtonStyle"
+                android:enabled="false"/>
+
+            <Button
+                android:id="@+id/submit_round"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_weight="1"
+                android:text="@string/submit_paired_dice"
+                tools:ignore="ButtonStyle"
+                android:enabled="false"/>
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_gravity="center_horizontal">
+
+            <TextView
+                android:id="@+id/prev_rounds"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingTop="25dp"
+                android:text="@string/previous_rounds"
+                android:textStyle="bold|italic"
+                android:textSize="20dp"
+                android:textColor="@color/teal_700"/>
+
+            <TextView
+                android:id="@+id/rounds"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textStyle="bold|italic"
+                android:textSize="20dp"
+                android:textColor="@color/teal_700" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="10dp"
+            android:gravity="bottom"
+            android:orientation="horizontal"
+            android:padding="20dp">
+
+            <Spinner
+                android:id="@+id/spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:spinnerMode="dropdown" />
+
+            <Button
+                android:id="@+id/throw_dice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/throw_dice" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

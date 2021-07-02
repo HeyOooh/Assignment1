@@ -1,0 +1,34 @@
+<resources>
+    <string name="app_name">Thirty_dice</string>
+    <string name="dice_content_desc">Dice</string>
+    <string name="submit_pair_dice">Save paired dice</string>
+    <string name="submit_paired_dice">Submit round</string>
+    <string name="throw_dice">Throw</string>
+
+    <string name="info_start_game">Click the THROW button to\nstart the game</string>
+    <string name="info_save_dice">Click the dice you would like to save,\nfor your next throw</string>
+    <string name="info_choose_dropdown">Choose a round from the dropdown,\nchoose wisely...</string>
+    <string name="info_pair_dice">Pair dice to chosen points\n then press SAVE PAIRED DICE</string>
+
+    <string name="previous_rounds">Previous rounds (do not choose again):\n</string>
+    <string name="yummyToast">Sum of dice not equals to chosen round</string>
+
+    <string name="RoundResultLbl">Round   |   Score</string>
+    <string name="results_header">GAME RESULTS</string>
+
+    <string name="total_score">Total Score: </string>
+
+    <string-array name="round_choice">
+        <item>Low</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+    </string-array>
+
+</resources>
