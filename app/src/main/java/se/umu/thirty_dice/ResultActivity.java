@@ -22,8 +22,8 @@ public class ResultActivity extends AppCompatActivity {
         this.gameRounds = getIntent().getParcelableArrayListExtra("se.umu.thirty_dice.gamerounds_arraylist");
 
         // Getting references to the Views needed
-        TextView resultText = (TextView) findViewById(R.id.results);
-        TextView totalScoreText = (TextView) findViewById(R.id.totalScore);
+        TextView resultText = findViewById(R.id.results);
+        TextView totalScoreText = findViewById(R.id.totalScore);
 
         // Creating and setting the score for each round, and the total score for all the rounds
         resultText.setText(getResultString(gameRounds));

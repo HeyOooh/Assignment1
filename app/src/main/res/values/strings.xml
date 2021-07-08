@@ -4,15 +4,13 @@
     <string name="dice_content_desc">Dice</string>
 
     <!-- Buttons -->
-    <string name="submit_pair_dice">Save paired dice</string>
-    <string name="submit_paired_dice">Submit round</string>
     <string name="throw_dice">Throw</string>
-    <string name="choose_dice">Start choosing dice</string>
+    <string name="calculate_submit">Calculate &amp; submit score</string>
 
     <!-- Text content -->
     <string name="info_start_game">Click the THROW button to\nstart the game</string>
     <string name="info_save_dice">Click the dice you would like to save,\nfor your next throw</string>
-    <string name="info_choose_dropdown">Choose a round from the dropdown,\nthen press CHOOSE DICE button</string>
+    <string name="info_choose_dropdown">Choose a round from the dropdown \nchoose wisely...</string>
     <string name="info_pair_dice">Pair dice to chosen points\n then press SAVE PAIRED DICE</string>
     <string name="previous_rounds">Previous rounds (do not choose again):\n</string>
     <string name="yummyToast">Sum of dice not equals to chosen round</string>
@@ -23,7 +21,7 @@
 
     <!-- Log messages -->
     <string name="state_not_allowed">This state is not allowed, something went wrong</string>
-    <string name="invalid_dice_choice">Invalid dice choice for this round</string>
+    <string name="get_dice_image_fail">Switch case failed, dice.getDots() should be 1-6</string>
 
     <!-- Spinner options-->
     <string-array name="round_choice">

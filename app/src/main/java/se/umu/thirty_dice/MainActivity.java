@@ -10,17 +10,12 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
-import java.io.Console;
-import java.util.ArrayList;
-
 public class MainActivity extends AppCompatActivity {
 
-    // An instance of the GameLogic that handles most of the logic of the game
     private GameLogicViewModel mGameLogicViewModel;
     private final String logcatTag = "MainActivity";
 
@@ -55,36 +50,30 @@ public class MainActivity extends AppCompatActivity {
         setDiceListeners(diceArray);
 
         // Reference to the TextView
-        infoText = (TextView) findViewById(R.id.textViewInfo);
-        prevRounds = (TextView) findViewById(R.id.prev_rounds);
-        rounds = (TextView) findViewById(R.id.rounds);
+        infoText = findViewById(R.id.textViewInfo);
+        prevRounds = findViewById(R.id.prev_rounds);
+        rounds = findViewById(R.id.rounds);
 
         // Reference to the buttons/dropdown
         Spinner round_choice_spinner = findViewById(R.id.spinner);
-        Button btnSaveDice = findViewById(R.id.save_paired_dice);
-        Button btnSubmitRound = findViewById(R.id.submit_round);
         Button btnThrow = findViewById(R.id.throw_dice);
-        Button btnChooseDice = findViewById(R.id.choose_dice);
+        Button btnCalculateSubmit = findViewById(R.id.calculate_submit);
 
         // Setup the dropdown/spinner
         dropdownArray = getResources().getStringArray(R.array.round_choice);
-        gameKindArray = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_item, dropdownArray);
+        gameKindArray = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_spinner_item, dropdownArray);
         gameKindArray.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         round_choice_spinner.setAdapter(gameKindArray);
 
         // Set the listener to the buttons and dropdown menu
-        setButtonsAndDropdownListener(round_choice_spinner, btnSaveDice, btnSubmitRound, btnThrow, diceArray, btnChooseDice);
+        setButtonsAndDropdownListener(round_choice_spinner, btnThrow, diceArray, btnCalculateSubmit);
 
         if (mGameLogicViewModel.isGameStarted()) {
             rounds.setText(mGameLogicViewModel.getRoundString());
             updateDiceGUI(mGameLogicViewModel.getDiceArray(), diceArray);
-
             String currentState = mGameLogicViewModel.getCurrentState();
-            Log.d(logcatTag, mGameLogicViewModel.getCurrentState());
-            updateButtonsGUI(currentState, round_choice_spinner, btnSaveDice, btnSubmitRound, btnThrow, btnChooseDice);
+            updateButtonsGUI(currentState, round_choice_spinner, btnThrow, btnCalculateSubmit);
         }
-
-        Log.d(logcatTag, "gameroundcounter" + mGameLogicViewModel.getGameRoundCounter() + "");
     }
 
     @Override
@@ -94,14 +83,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Setting the listeners for the buttons and the drowdown
+     * Set the listeners for the buttons and the spinner
      *
      * @param round_choice_spinner
-     * @param btnSaveDice
-     * @param btnSubmitRound
      * @param btnThrow
+     * @param imageButtonDiceArray
+     * @param btnCalculateSubmit
      */
-    private void setButtonsAndDropdownListener(Spinner round_choice_spinner, Button btnSaveDice, Button btnSubmitRound, Button btnThrow, ImageButton[] imageButtonDiceArray, Button btnChooseDice) {
+    private void setButtonsAndDropdownListener(Spinner round_choice_spinner, Button btnThrow, ImageButton[] imageButtonDiceArray, Button btnCalculateSubmit) {
         final String[] currentRoundChoice = {""};
 
         // Dropdown listener, setting currentRoundChoice in gameLogic
@@ -118,65 +107,9 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
+                // Not implemented, will never occur
             }
         });
-
-
-        // ---------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-        // Button SAVE PAIRED DICE
-        btnSaveDice.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!mGameLogicViewModel.calcPoints()) {
-                    Toast.makeText(MainActivity.this, getResources().getString(R.string.invalid_dice_choice), Toast.LENGTH_SHORT).show();
-                }
-                updateDiceGUI(mGameLogicViewModel.getDiceArray(), imageButtonDiceArray);
-            }
-        });
-
-        // Button SUBMIT ROUND
-        btnSubmitRound.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                mGameLogicViewModel.setCurrentState("inRoundThrowsLeft");
-                updateButtonsGUI(mGameLogicViewModel.getCurrentState(), round_choice_spinner, btnSaveDice, btnSubmitRound, btnThrow, btnChooseDice);
-
-                mGameLogicViewModel.resetThrowCounter();
-                mGameLogicViewModel.resetIsDiceSaved();
-                mGameLogicViewModel.resetIsDiceLocked();
-                String roundString = mGameLogicViewModel.addToRoundString(dropdownArray[mGameLogicViewModel.getCurrentRound()] + " ");
-                rounds.setText(roundString);
-
-                updateDiceGUI(mGameLogicViewModel.getDiceArray(), imageButtonDiceArray);
-
-                if (mGameLogicViewModel.isGameOver()) {
-                    Intent intent = new Intent(MainActivity.this, ResultActivity.class);
-                    intent.putParcelableArrayListExtra(EXTRA_GAMEROUNDS_ARRAYLIST, mGameLogicViewModel.getGameRounds());
-                    startActivity(intent);
-                }
-            }
-        });
-
-        // Button CHOOSE DICE
-        btnChooseDice.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                if (!mGameLogicViewModel.isGameStarted()) return;
-
-
-                mGameLogicViewModel.setCurrentRoundChoice(currentRoundChoice[0]);
-
-                mGameLogicViewModel.setCurrentState("pairDice");
-                updateButtonsGUI(mGameLogicViewModel.getCurrentState(), round_choice_spinner, btnSaveDice, btnSubmitRound, btnThrow, btnChooseDice);
-
-            }
-        });
-
-        // ---------------------------------------------------------------------------------------------------------------------------------------------------------------
-
 
         // Button THROW
         btnThrow.setOnClickListener(new View.OnClickListener() {
@@ -185,16 +118,46 @@ public class MainActivity extends AppCompatActivity {
                 mGameLogicViewModel.setGameStarted(true);
 
                 mGameLogicViewModel.setCurrentState("inRoundThrowsLeft");
-                updateButtonsGUI(mGameLogicViewModel.getCurrentState(), round_choice_spinner, btnSaveDice, btnSubmitRound, btnThrow, btnChooseDice);
+                updateButtonsGUI(mGameLogicViewModel.getCurrentState(), round_choice_spinner, btnThrow, btnCalculateSubmit);
                 Dice[] diceArray = mGameLogicViewModel.throwAllDice();
                 updateDiceGUI(diceArray, imageButtonDiceArray);
 
                 if (mGameLogicViewModel.isLastThrow()) {
                     mGameLogicViewModel.setCurrentState("inRoundNoThrowsLeft");
-                    updateButtonsGUI(mGameLogicViewModel.getCurrentState(), round_choice_spinner, btnSaveDice, btnSubmitRound, btnThrow, btnChooseDice);
+                    updateButtonsGUI(mGameLogicViewModel.getCurrentState(), round_choice_spinner, btnThrow, btnCalculateSubmit);
                 }
             }
+        });
 
+
+        // Button CALCULATE SCORE & SUBMIT
+        btnCalculateSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (!mGameLogicViewModel.isGameStarted()) return;
+
+                // Set the current round (Low, 4-12) then calculate the score
+                mGameLogicViewModel.setCurrentRoundChoice(currentRoundChoice[0]);
+                mGameLogicViewModel.calcPoints();
+
+                // If we have played 10 rounds, show the ResultsActivity with the result
+                if (mGameLogicViewModel.isGameOver()) {
+                    Intent intent = new Intent(MainActivity.this, ResultActivity.class);
+                    intent.putParcelableArrayListExtra(EXTRA_GAMEROUNDS_ARRAYLIST, mGameLogicViewModel.getGameRounds());
+                    startActivity(intent);
+                }
+
+                mGameLogicViewModel.resetThrowCounter();
+                mGameLogicViewModel.resetIsDiceSaved();
+
+                // Update the GUI, based on current "state"
+                mGameLogicViewModel.setCurrentState("inRoundThrowsLeft");
+                String roundString = mGameLogicViewModel.addToRoundString(dropdownArray[mGameLogicViewModel.getCurrentRound()] + " ");
+                rounds.setText(roundString);
+                updateButtonsGUI(mGameLogicViewModel.getCurrentState(), round_choice_spinner, btnThrow, btnCalculateSubmit);
+                updateDiceGUI(mGameLogicViewModel.getDiceArray(), imageButtonDiceArray);
+            }
         });
     }
 
@@ -222,11 +185,10 @@ public class MainActivity extends AppCompatActivity {
             imageButtonDiceArray[i].setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (!mGameLogicViewModel.isGameStarted())
-                        return; // If the game is not started, do nothing when a Dice is pressed...
+                    // If the game is not started, do nothing when a Dice is pressed...
+                    if (!mGameLogicViewModel.isGameStarted()) return;
 
                     Dice currentDice = mGameLogicViewModel.getCurrentDice(finalI);
-                    if (currentDice.isLocked()) return;
                     currentDice.toggleSaved();
                     setDiceImageResource(currentDice, imageButtonDiceArray[finalI]);
                 }
@@ -251,25 +213,6 @@ public class MainActivity extends AppCompatActivity {
      * @return
      */
     public int getImageResource(Dice d) {
-        if (d.isLocked()) {
-            switch (d.getDots()) {
-                case 1:
-                    return R.drawable.red1;
-                case 2:
-                    return R.drawable.red2;
-                case 3:
-                    return R.drawable.red3;
-                case 4:
-                    return R.drawable.red4;
-                case 5:
-                    return R.drawable.red5;
-                case 6:
-                    return R.drawable.red6;
-                default:
-                    Log.d("fail", "Switch case failed, dice.dots should be 1-6");
-                    return -1;
-            }
-        }
         if (!d.getIsSaved()) {
             switch (d.getDots()) {
                 case 1:
@@ -285,7 +228,7 @@ public class MainActivity extends AppCompatActivity {
                 case 6:
                     return R.drawable.white6;
                 default:
-                    Log.d("fail", "Switch case failed, dice.dots should be 1-6");
+                    Log.d("fail", getResources().getString(R.string.get_dice_image_fail));
                     return -1;
             }
         } else {
@@ -303,7 +246,7 @@ public class MainActivity extends AppCompatActivity {
                 case 6:
                     return R.drawable.grey6;
                 default:
-                    Log.d("fail", "Switch case failed, dice.dots should be 1-6");
+                    Log.d("fail", getResources().getString(R.string.get_dice_image_fail));
                     return -1;
             }
         }
@@ -314,31 +257,17 @@ public class MainActivity extends AppCompatActivity {
      *
      * @param currentState
      */
-    private void updateButtonsGUI(String currentState, Spinner round_choice_spinner, Button btnSaveDice, Button btnSubmitRound, Button btnThrow, Button btnChooseDice) {
+    private void updateButtonsGUI(String currentState, Spinner round_choice_spinner, Button btnThrow, Button btnCalculateSubmit) {
         switch (currentState) {
-
             case "inRoundThrowsLeft":
-                Log.d(logcatTag, "case: inRoundThrowsLeft");
                 infoText.setText(getResources().getString(R.string.info_save_dice));
-                btnSaveDice.setEnabled(false);
-                btnSubmitRound.setEnabled(false);
                 btnThrow.setEnabled(true);
                 round_choice_spinner.setEnabled(true);
                 break;
-
             case "inRoundNoThrowsLeft":
                 infoText.setText(getResources().getString(R.string.info_choose_dropdown));
                 btnThrow.setEnabled(false);
                 break;
-
-            case "pairDice":
-                btnSaveDice.setEnabled(true);
-                btnSubmitRound.setEnabled(true);
-                btnThrow.setEnabled(false);
-                round_choice_spinner.setEnabled(false);
-                infoText.setText(getResources().getString(R.string.info_pair_dice));
-                break;
-
             default:
                 Log.d("error", getResources().getString(R.string.state_not_allowed));
         }

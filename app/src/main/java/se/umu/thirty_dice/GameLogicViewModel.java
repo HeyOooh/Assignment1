@@ -1,23 +1,16 @@
 package se.umu.thirty_dice;
 
-import android.util.Log;
-
-import java.util.ArrayList;
-import java.util.Vector;
-
-import android.widget.Toast;
-
 import androidx.lifecycle.ViewModel;
+import java.util.ArrayList;
 
 /**
  * Class to handle most of the logic of the game
  */
 public class GameLogicViewModel extends ViewModel {
 
-    private final String logcatTag = "GameLogic";
-
     // Array to keep track of all the Dice
     private Dice[] diceArray = {new Dice(), new Dice(), new Dice(), new Dice(), new Dice(), new Dice()};
+
     // ArrayList to hold all the gameRound, to be used in for the results
     ArrayList<GameRound> gameRounds = new ArrayList<>();
 
@@ -28,8 +21,9 @@ public class GameLogicViewModel extends ViewModel {
     private String currentState = "beforeStart";
     private final int MAX_ROUNDS = 10;
     private final int MAX_THROWS = 3;
+    private int targetSum;
 
-    // Getters and setters
+    // ---------------- Getters and setters ------------------
     public String getCurrentState() {
         return currentState;
     }
@@ -42,15 +36,15 @@ public class GameLogicViewModel extends ViewModel {
         return this.currentRound;
     }
 
+    public void setCurrentRound(int current) {
+        this.currentRound = current;
+    }
+
     /**
      * @return If the game is over or not, used to show the resultActivity after the tenth round
      */
     public boolean isGameOver() {
         return this.gameRounds.size() >= this.MAX_ROUNDS;
-    }
-
-    public void setCurrentRound(int current) {
-        this.currentRound = current;
     }
 
     public String getRoundString() {
@@ -78,20 +72,6 @@ public class GameLogicViewModel extends ViewModel {
         this.gameRounds.add(new GameRound(currentRoundChoice));
     }
 
-    public int getGameRoundCounter() {
-        return this.gameRounds.size();
-    }
-
-    /**
-     * The dice that is pressed os saved and will the boolean that maps to that dice in the array is set to true
-     *
-     * @param diceNumber
-     * @return
-     */
-    public void setIsDiceSaved(int diceNumber) {
-        diceArray[diceNumber].toggleSaved();
-    }
-
     public Dice[] getDiceArray() {
         return this.diceArray;
     }
@@ -99,20 +79,16 @@ public class GameLogicViewModel extends ViewModel {
     public Dice getCurrentDice(int current) {
         return this.diceArray[current];
     }
+    // -------------------------------------------------------
 
-
+    /**
+     * Creates the string that is shown for the previous round, etc: 4 12 Low 9
+     * @param currentRound
+     * @return
+     */
     public String addToRoundString(String currentRound) {
         this.roundsString += currentRound;
         return this.roundsString;
-    }
-
-    /**
-     * Adds a gameRound to the gameRounds ArrayList and increments the gameRoundCounter
-     *
-     * @param gameRound
-     */
-    public void addGameRound(GameRound gameRound) {
-        this.gameRounds.add(gameRound);
     }
 
     /**
@@ -120,13 +96,6 @@ public class GameLogicViewModel extends ViewModel {
      */
     public void resetIsDiceSaved() {
         for (Dice d : diceArray) d.setIsSaved(false);
-    }
-
-    /**
-     * Resets the locked state in the for every Dice
-     */
-    public void resetIsDiceLocked() {
-        for (Dice d : diceArray) d.setLocked(false);
     }
 
     /**
@@ -147,88 +116,44 @@ public class GameLogicViewModel extends ViewModel {
     }
 
     /**
-     * Method to calc the scores, if the chosen dice is not valid for the current round, a Toast is shown to indicate the choice is invalid
-     */
-    public boolean calcPoints() {
-        GameRound currentGameRound = gameRounds.get(gameRounds.size() - 1);
-
-        // The case "Low" is not similar to the rest of the choices so it is handled directly in the switch case
-        switch (currentGameRound.getGameRound()) {
-            case "Low":
-                // If one or more of the dice have a value of 4, 5 or 6
-                for (Dice d : diceArray) {
-                    if (d.getIsSaved() && d.getDots() > 3) {
-                        return false;
-                    }
-                }
-
-                // If the dice chosen is all valid (1, 2 or 3)
-                for (Dice d : diceArray) {
-                    if (d.getIsSaved() && d.getDots() <= 3) {
-                        currentGameRound.updateTotalScore(d.getDots());
-                        d.setLocked(true);
-                    }
-                }
-                return true;
-
-            // Case 4-12 are all similar and are handled in the calculateScore method
-            case "4":
-                return calculateScore(4, currentGameRound);
-            case "5":
-                return calculateScore(5, currentGameRound);
-            case "6":
-                return calculateScore(6, currentGameRound);
-            case "7":
-                return calculateScore(7, currentGameRound);
-            case "8":
-                return calculateScore(8, currentGameRound);
-            case "9":
-                return calculateScore(9, currentGameRound);
-            case "10":
-                return calculateScore(10, currentGameRound);
-            case "11":
-                return calculateScore(11, currentGameRound);
-            case "12":
-                return calculateScore(12, currentGameRound);
-            default:
-                Log.d("success", "Switch case failed, dice.dots should be 1-6");
-                return false;
-        }
-    }
-
-    /*
-    /**
-     * Helper method to calculate the score, given the chosen round, for the rounds 4-12
+     * Increments the throwcounter and checks if it is the last (3) throw
      *
-     * @param chosenRound
-     * @param currentGameRound
      * @return
      */
-    private boolean calculateScore(int chosenRound, GameRound currentGameRound) {
-        int totalDots = 0;
-        for (Dice d : diceArray) {
-            if (d.getIsSaved()) {
-                totalDots += d.getDots();
-            }
-        }
+    public boolean isLastThrow() {
+        return ++this.throwCounter == MAX_THROWS;
+    }
 
-        if (totalDots == chosenRound) {
-            currentGameRound.updateTotalScore(chosenRound);
+    /**
+     * Method to calc the scores, if the chosen dice is not valid for the current round, a Toast is shown to indicate the choice is invalid
+     */
+    public void calcPoints() {
+        GameRound currentGameRound = gameRounds.get(gameRounds.size() - 1);
 
+        // Calculate the total point for the round "Low"
+        if (currentGameRound.getGameRound().equals("Low")) {
             for (Dice d : diceArray) {
-                if (d.getIsSaved()) {
-                    d.setLocked(true);
-                    d.setIsSaved(false);
+                if (d.getDots() <= 3) {
+                    currentGameRound.updateTotalScore(d.getDots());
                 }
             }
-            return true;
         } else {
-            return false;
+            // Else if the current round is 4-12
+            targetSum = Integer.parseInt(currentGameRound.getGameRound());
+
+            // Create an ArrayList with the int values from the Dice array
+            ArrayList<Integer> diceArrayListInt = new ArrayList<>();
+            for (Dice d : diceArray) {
+                diceArrayListInt.add(d.getDots());
+            }
+
+            // Update the score of the currentGameRound
+            currentGameRound.updateTotalScore(score(diceArrayListInt));
         }
     }
 
-    int targetSum = 1337;
-    // --------------------------------------Från github-------------------------------------------------
+    // ---------------------------------------------From Stack overflow, user wcochran ---------------------------------------------
+    // https://stackoverflow.com/questions/62733378/how-to-calculate-the-sum-of-dice-whose-value-combined-amounts-to-an-input-number
     public int sumOfDice(ArrayList<Integer> dice) {
         int sum = 0;
         for (int d : dice)
@@ -236,7 +161,6 @@ public class GameLogicViewModel extends ViewModel {
         return sum;
     }
 
-    // Denna ska man kalla på först sen löser sig resten
     public int score(ArrayList<Integer> dice) {
         return score(dice, 0);
     }
@@ -260,13 +184,5 @@ public class GameLogicViewModel extends ViewModel {
         }
         return hi;
     }
-
-    /**
-     * Increments the throwcounter and checks if it is the last (3) throw
-     *
-     * @return
-     */
-    public boolean isLastThrow() {
-        return ++this.throwCounter == MAX_THROWS;
-    }
+    // -------------------------------------------------------------------------------------------------------------------------------
 }

@@ -102,13 +102,11 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
         android:gravity="center"
         android:text="@string/info_start_game"
         android:textColor="@color/teal_700"
         android:textSize="20sp"
         android:textStyle="bold|italic"
-        app:layout_constraintEnd_toStartOf="@+id/submit_round"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/dice3" />
 
@@ -118,14 +116,12 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
         android:layout_weight="1"
         android:paddingTop="25dp"
         android:text="@string/previous_rounds"
         android:textColor="@color/teal_700"
         android:textSize="20sp"
         android:textStyle="bold|italic"
-        app:layout_constraintEnd_toStartOf="@+id/submit_round"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewInfo" />
 
@@ -134,12 +130,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
         android:layout_weight="1"
         android:textColor="@color/teal_700"
         android:textSize="20sp"
         android:textStyle="bold|italic"
-        app:layout_constraintEnd_toStartOf="@+id/submit_round"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/prev_rounds" />
 
@@ -172,48 +166,14 @@
 
 
     <Button
-        android:id="@+id/save_paired_dice"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_weight="1"
-        android:enabled="false"
-        android:text="@string/submit_pair_dice"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/dice5"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="ButtonStyle" />
-
-    <Button
-        android:id="@+id/submit_round"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_weight="1"
-        android:enabled="false"
-        android:text="@string/submit_paired_dice"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/dice5"
-        app:layout_constraintTop_toBottomOf="@+id/save_paired_dice"
-        tools:ignore="ButtonStyle" />
-
-    <Button
-        android:id="@+id/choose_dice"
+        android:id="@+id/calculate_submit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:text="@string/choose_dice"
+        android:text="@string/calculate_submit"
         app:layout_constraintBottom_toTopOf="@+id/spinner"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/dice5"
-        app:layout_constraintTop_toBottomOf="@+id/submit_round" />
+        app:layout_constraintStart_toEndOf="@+id/dice5" />
 </androidx.constraintlayout.widget.ConstraintLayout>
