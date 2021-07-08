@@ -1,34 +1,27 @@
 package se.umu.thirty_dice;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Color;
-import android.icu.text.LocaleDisplayNames;
-import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
+import java.io.Console;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     // An instance of the GameLogic that handles most of the logic of the game
-    private final GameLogic gameLogic = new GameLogic();
+    private GameLogicViewModel mGameLogicViewModel;
     private final String logcatTag = "MainActivity";
 
     private TextView infoText;
@@ -37,13 +30,16 @@ public class MainActivity extends AppCompatActivity {
 
     private String[] dropdownArray;
     ArrayAdapter<String> gameKindArray;
-    String roundsString = "";
 
-    private static final String EXTRA_GAMEROUNDS_ARRAYLIST= "se.umu.thirty_dice.gamerounds_arraylist";
+    private static final String EXTRA_GAMEROUNDS_ARRAYLIST = "se.umu.thirty_dice.gamerounds_arraylist";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
+
+        // Gets the ViewModel for this Activity
+        mGameLogicViewModel = new ViewModelProvider(this).get(GameLogicViewModel.class);
         setContentView(R.layout.activity_main);
 
         // Reference to the dice
@@ -68,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
         Button btnSaveDice = findViewById(R.id.save_paired_dice);
         Button btnSubmitRound = findViewById(R.id.submit_round);
         Button btnThrow = findViewById(R.id.throw_dice);
-
+        Button btnChooseDice = findViewById(R.id.choose_dice);
 
         // Setup the dropdown/spinner
         dropdownArray = getResources().getStringArray(R.array.round_choice);
@@ -77,7 +73,24 @@ public class MainActivity extends AppCompatActivity {
         round_choice_spinner.setAdapter(gameKindArray);
 
         // Set the listener to the buttons and dropdown menu
-        setButtonsAndDrowdownListener(round_choice_spinner, btnSaveDice, btnSubmitRound, btnThrow, diceArray);
+        setButtonsAndDropdownListener(round_choice_spinner, btnSaveDice, btnSubmitRound, btnThrow, diceArray, btnChooseDice);
+
+        if (mGameLogicViewModel.isGameStarted()) {
+            rounds.setText(mGameLogicViewModel.getRoundString());
+            updateDiceGUI(mGameLogicViewModel.getDiceArray(), diceArray);
+
+            String currentState = mGameLogicViewModel.getCurrentState();
+            Log.d(logcatTag, mGameLogicViewModel.getCurrentState());
+            updateButtonsGUI(currentState, round_choice_spinner, btnSaveDice, btnSubmitRound, btnThrow, btnChooseDice);
+        }
+
+        Log.d(logcatTag, "gameroundcounter" + mGameLogicViewModel.getGameRoundCounter() + "");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        rounds.setText(mGameLogicViewModel.getRoundString());
     }
 
     /**
@@ -88,85 +101,100 @@ public class MainActivity extends AppCompatActivity {
      * @param btnSubmitRound
      * @param btnThrow
      */
-    private void setButtonsAndDrowdownListener(Spinner round_choice_spinner, Button btnSaveDice, Button btnSubmitRound, Button btnThrow, ImageButton[] imageButtonDiceArray) {
+    private void setButtonsAndDropdownListener(Spinner round_choice_spinner, Button btnSaveDice, Button btnSubmitRound, Button btnThrow, ImageButton[] imageButtonDiceArray, Button btnChooseDice) {
+        final String[] currentRoundChoice = {""};
 
         // Dropdown listener, setting currentRoundChoice in gameLogic
         round_choice_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (gameLogic.isGameStarted()) {
-
-                    btnSaveDice.setEnabled(true);
-                    btnSubmitRound.setEnabled(true);
-                    btnThrow.setEnabled(false);
-                    round_choice_spinner.setEnabled(false);
-
-                    gameLogic.setCurrentRoundChoice(parent.getItemAtPosition(position).toString());
-                    gameLogic.resetIsDiceSaved();
-
-                    infoText.setText(getResources().getString(R.string.info_pair_dice));
-                    roundsString += dropdownArray[position] + " ";
-                    rounds.setText(roundsString);
-
-                    updateDiceGUI(gameLogic.getDiceArray(), imageButtonDiceArray);
+                if (mGameLogicViewModel.isGameStarted()) {
+                    currentRoundChoice[0] = parent.getItemAtPosition(position).toString();
+                    mGameLogicViewModel.resetIsDiceSaved();
+                    mGameLogicViewModel.setCurrentRound(position);
                 }
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                Log.d(logcatTag, "round_choice_spinner:" + " nothing selected");
             }
         });
 
-        // Button save dice listener
+
+        // ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        // Button SAVE PAIRED DICE
         btnSaveDice.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!gameLogic.calcPoints()) {
-                    Toast.makeText(MainActivity.this, "Invalid dice choice for this round", Toast.LENGTH_SHORT).show();
+                if (!mGameLogicViewModel.calcPoints()) {
+                    Toast.makeText(MainActivity.this, getResources().getString(R.string.invalid_dice_choice), Toast.LENGTH_SHORT).show();
                 }
-                updateDiceGUI(gameLogic.getDiceArray(), imageButtonDiceArray);
+                updateDiceGUI(mGameLogicViewModel.getDiceArray(), imageButtonDiceArray);
             }
         });
 
-        // Button submit round
+        // Button SUBMIT ROUND
         btnSubmitRound.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                btnThrow.setEnabled(true);
-                btnSaveDice.setEnabled(false);
-                btnSubmitRound.setEnabled(false);
-                round_choice_spinner.setEnabled(true);
 
-                gameLogic.resetThrowCounter();
-                gameLogic.resetIsDiceSaved();
-                gameLogic.resetIsDiceLocked();
-                updateDiceGUI(gameLogic.getDiceArray(), imageButtonDiceArray);
+                mGameLogicViewModel.setCurrentState("inRoundThrowsLeft");
+                updateButtonsGUI(mGameLogicViewModel.getCurrentState(), round_choice_spinner, btnSaveDice, btnSubmitRound, btnThrow, btnChooseDice);
 
-                // If it is the last round (10) all the results from each round is send with an intent
-                // to the result activity and is shown
-                if(gameLogic.getGameRoundCounter() == 10) {
+                mGameLogicViewModel.resetThrowCounter();
+                mGameLogicViewModel.resetIsDiceSaved();
+                mGameLogicViewModel.resetIsDiceLocked();
+                String roundString = mGameLogicViewModel.addToRoundString(dropdownArray[mGameLogicViewModel.getCurrentRound()] + " ");
+                rounds.setText(roundString);
+
+                updateDiceGUI(mGameLogicViewModel.getDiceArray(), imageButtonDiceArray);
+
+                if (mGameLogicViewModel.isGameOver()) {
                     Intent intent = new Intent(MainActivity.this, ResultActivity.class);
-                    intent.putParcelableArrayListExtra (EXTRA_GAMEROUNDS_ARRAYLIST, gameLogic.getGameRounds());
+                    intent.putParcelableArrayListExtra(EXTRA_GAMEROUNDS_ARRAYLIST, mGameLogicViewModel.getGameRounds());
                     startActivity(intent);
                 }
             }
         });
 
-        // Button throw listener
+        // Button CHOOSE DICE
+        btnChooseDice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (!mGameLogicViewModel.isGameStarted()) return;
+
+
+                mGameLogicViewModel.setCurrentRoundChoice(currentRoundChoice[0]);
+
+                mGameLogicViewModel.setCurrentState("pairDice");
+                updateButtonsGUI(mGameLogicViewModel.getCurrentState(), round_choice_spinner, btnSaveDice, btnSubmitRound, btnThrow, btnChooseDice);
+
+            }
+        });
+
+        // ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+        // Button THROW
         btnThrow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                gameLogic.setGameStarted(true);
-                infoText.setText(getResources().getString(R.string.info_save_dice));
-                Dice[] diceArray = gameLogic.throwAllDice();
+                mGameLogicViewModel.setGameStarted(true);
+
+                mGameLogicViewModel.setCurrentState("inRoundThrowsLeft");
+                updateButtonsGUI(mGameLogicViewModel.getCurrentState(), round_choice_spinner, btnSaveDice, btnSubmitRound, btnThrow, btnChooseDice);
+                Dice[] diceArray = mGameLogicViewModel.throwAllDice();
                 updateDiceGUI(diceArray, imageButtonDiceArray);
-                if (gameLogic.increaseThrowCounter() == 3) {
-                    infoText.setText(getResources().getString(R.string.info_choose_dropdown));
-                    btnThrow.setEnabled(false);
+
+                if (mGameLogicViewModel.isLastThrow()) {
+                    mGameLogicViewModel.setCurrentState("inRoundNoThrowsLeft");
+                    updateButtonsGUI(mGameLogicViewModel.getCurrentState(), round_choice_spinner, btnSaveDice, btnSubmitRound, btnThrow, btnChooseDice);
                 }
             }
+
         });
     }
 
@@ -178,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void updateDiceGUI(Dice[] diceArray, ImageButton[] imageButtonDiceArray) {
         for (int i = 0; i < diceArray.length; i++) {
-            imageButtonDiceArray[i].setImageResource(diceArray[i].getImageResource());
+            imageButtonDiceArray[i].setImageResource(getImageResource(diceArray[i]));
         }
     }
 
@@ -194,10 +222,11 @@ public class MainActivity extends AppCompatActivity {
             imageButtonDiceArray[i].setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(!gameLogic.isGameStarted()) return; // If the game is not started, do nothing when a Dice is pressed...
+                    if (!mGameLogicViewModel.isGameStarted())
+                        return; // If the game is not started, do nothing when a Dice is pressed...
 
-                    Dice currentDice = gameLogic.getCurrentDice(finalI);
-                    if(currentDice.isLocked()) return;
+                    Dice currentDice = mGameLogicViewModel.getCurrentDice(finalI);
+                    if (currentDice.isLocked()) return;
                     currentDice.toggleSaved();
                     setDiceImageResource(currentDice, imageButtonDiceArray[finalI]);
                 }
@@ -212,6 +241,106 @@ public class MainActivity extends AppCompatActivity {
      * @param imageButton
      */
     private void setDiceImageResource(Dice d, ImageButton imageButton) {
-        imageButton.setImageResource(d.getImageResource());
+        imageButton.setImageResource(getImageResource(d));
+    }
+
+
+    /**
+     * Keeps track of the images for the dice
+     *
+     * @return
+     */
+    public int getImageResource(Dice d) {
+        if (d.isLocked()) {
+            switch (d.getDots()) {
+                case 1:
+                    return R.drawable.red1;
+                case 2:
+                    return R.drawable.red2;
+                case 3:
+                    return R.drawable.red3;
+                case 4:
+                    return R.drawable.red4;
+                case 5:
+                    return R.drawable.red5;
+                case 6:
+                    return R.drawable.red6;
+                default:
+                    Log.d("fail", "Switch case failed, dice.dots should be 1-6");
+                    return -1;
+            }
+        }
+        if (!d.getIsSaved()) {
+            switch (d.getDots()) {
+                case 1:
+                    return R.drawable.white1;
+                case 2:
+                    return R.drawable.white2;
+                case 3:
+                    return R.drawable.white3;
+                case 4:
+                    return R.drawable.white4;
+                case 5:
+                    return R.drawable.white5;
+                case 6:
+                    return R.drawable.white6;
+                default:
+                    Log.d("fail", "Switch case failed, dice.dots should be 1-6");
+                    return -1;
+            }
+        } else {
+            switch (d.getDots()) {
+                case 1:
+                    return R.drawable.grey1;
+                case 2:
+                    return R.drawable.grey2;
+                case 3:
+                    return R.drawable.grey3;
+                case 4:
+                    return R.drawable.grey4;
+                case 5:
+                    return R.drawable.grey5;
+                case 6:
+                    return R.drawable.grey6;
+                default:
+                    Log.d("fail", "Switch case failed, dice.dots should be 1-6");
+                    return -1;
+            }
+        }
+    }
+
+    /**
+     * Update the buttons and the textfields depending on the currentState
+     *
+     * @param currentState
+     */
+    private void updateButtonsGUI(String currentState, Spinner round_choice_spinner, Button btnSaveDice, Button btnSubmitRound, Button btnThrow, Button btnChooseDice) {
+        switch (currentState) {
+
+            case "inRoundThrowsLeft":
+                Log.d(logcatTag, "case: inRoundThrowsLeft");
+                infoText.setText(getResources().getString(R.string.info_save_dice));
+                btnSaveDice.setEnabled(false);
+                btnSubmitRound.setEnabled(false);
+                btnThrow.setEnabled(true);
+                round_choice_spinner.setEnabled(true);
+                break;
+
+            case "inRoundNoThrowsLeft":
+                infoText.setText(getResources().getString(R.string.info_choose_dropdown));
+                btnThrow.setEnabled(false);
+                break;
+
+            case "pairDice":
+                btnSaveDice.setEnabled(true);
+                btnSubmitRound.setEnabled(true);
+                btnThrow.setEnabled(false);
+                round_choice_spinner.setEnabled(false);
+                infoText.setText(getResources().getString(R.string.info_pair_dice));
+                break;
+
+            default:
+                Log.d("error", getResources().getString(R.string.state_not_allowed));
+        }
     }
 }

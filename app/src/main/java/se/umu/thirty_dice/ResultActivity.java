@@ -6,6 +6,9 @@ import android.os.Bundle;
 import android.widget.TextView;
 import java.util.ArrayList;
 
+/**
+ * Class that displays the results of the game after the game is finished
+ */
 public class ResultActivity extends AppCompatActivity {
 
     private ArrayList<GameRound> gameRounds;
@@ -54,7 +57,6 @@ public class ResultActivity extends AppCompatActivity {
         String results = "";
         for (GameRound current: gameRounds) {
             String currGameRoundFormatted = String.format(format, current.getGameRound(), current.getTotalScore() + "");
-            // String currTotalScoreFormatted = String.format("% d", current.getTotalScore());
             results += currGameRoundFormatted;
         }
 

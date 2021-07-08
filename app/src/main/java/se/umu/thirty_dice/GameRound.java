@@ -62,11 +62,6 @@ public class GameRound implements Parcelable, Comparable  {
     }
 
     @Override
-    public String toString() {
-        return this.gameRound;
-    }
-
-    @Override
     public int describeContents() {
         return 0;
     }
@@ -96,5 +91,10 @@ public class GameRound implements Parcelable, Comparable  {
             this.gameRound = "-1";
         }
         return Integer.parseInt(this.gameRound) - currentGameRound;
+    }
+
+    @Override
+    public String toString() {
+        return this.gameRound + ": " + this.totalScore;
     }
 }

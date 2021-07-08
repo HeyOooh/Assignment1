@@ -110,7 +110,7 @@
             android:layout_marginBottom="60dp"
             android:text="@string/info_start_game"
             android:textStyle="bold|italic"
-            android:textSize="20dp"
+            android:textSize="20sp"
             android:textColor="@color/teal_700"/>
 
         <LinearLayout
@@ -159,7 +159,7 @@
                 android:paddingTop="25dp"
                 android:text="@string/previous_rounds"
                 android:textStyle="bold|italic"
-                android:textSize="20dp"
+                android:textSize="20sp"
                 android:textColor="@color/teal_700"/>
 
             <TextView
@@ -168,8 +168,17 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:textStyle="bold|italic"
-                android:textSize="20dp"
+                android:textSize="20sp"
                 android:textColor="@color/teal_700" />
+
+            <Button
+                android:id="@+id/choose_dice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/choose_dice"
+                />
+
         </LinearLayout>
 
         <LinearLayout

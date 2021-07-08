@@ -13,8 +13,6 @@ public class Dice {
     private int dots;
     private boolean isSaved;
 
-
-
     private boolean isLocked;
     private String color = "white";
     private int imageResource = R.drawable.white1;
@@ -65,66 +63,5 @@ public class Dice {
         isLocked = locked;
     }
 
-    /**
-     * Keeps track of the images for the dice
-     * @return
-     */
-    public int getImageResource() {
-        if(this.isLocked) {
-            switch (this.dots) {
-                case 1:
-                    return R.drawable.red1;
-                case 2:
-                    return R.drawable.red2;
-                case 3:
-                    return R.drawable.red3;
-                case 4:
-                    return R.drawable.red4;
-                case 5:
-                    return R.drawable.red5;
-                case 6:
-                    return R.drawable.red6;
-                default:
-                    Log.d("fail", "Switch case failed, dice.dots should be 1-6");
-                    return -1;
-            }
-        }
-        if (!this.isSaved) {
-            switch (this.dots) {
-                case 1:
-                    return R.drawable.white1;
-                case 2:
-                    return R.drawable.white2;
-                case 3:
-                    return R.drawable.white3;
-                case 4:
-                    return R.drawable.white4;
-                case 5:
-                    return R.drawable.white5;
-                case 6:
-                    return R.drawable.white6;
-                default:
-                    Log.d("fail", "Switch case failed, dice.dots should be 1-6");
-                    return -1;
-            }
-        } else {
-            switch (this.dots) {
-                case 1:
-                    return R.drawable.grey1;
-                case 2:
-                    return R.drawable.grey2;
-                case 3:
-                    return R.drawable.grey3;
-                case 4:
-                    return R.drawable.grey4;
-                case 5:
-                    return R.drawable.grey5;
-                case 6:
-                    return R.drawable.grey6;
-                default:
-                    Log.d("fail", "Switch case failed, dice.dots should be 1-6");
-                    return -1;
-            }
-        }
-    }
+
 }
